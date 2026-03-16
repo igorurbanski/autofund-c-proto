@@ -1,0 +1,290 @@
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { ChevronDown, ArrowUpRight } from "lucide-react"
+import { Section } from "@/components/section"
+import { SectionHeading } from "@/components/section-heading"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { PRODUCTS, type ProductColor } from "../constants/products"
+import { useLanding } from "../context/landing-context"
+
+const COLOR_MAP: Record<ProductColor, { dot: string }> = {
+  violet: { dot: "bg-brand-500" },
+  lime: { dot: "bg-brand2-700" },
+  plum: { dot: "bg-brand-800" },
+  olive: { dot: "bg-brand2-900" },
+}
+
+const BORROWER_BASE = [
+  { value: "firma-start", label: "Firma od pierwszego dnia założenia" },
+  { value: "firma", label: "Firma" },
+]
+
+const BORROWER_WITH_PERSON = [
+  ...BORROWER_BASE,
+  { value: "osoba-fizyczna", label: "Osoba fizyczna" },
+]
+
+const BODY_TYPES = [
+  "Sedan",
+  "SUV",
+  "Hatchback",
+  "Kombi",
+  "Coupé",
+  "Kabriolet",
+  "Van",
+  "Pick-up",
+]
+
+const FUEL_TYPES = ["Benzyna", "Diesel", "LPG", "Hybryda", "Elektryczny"]
+
+const CURRENT_YEAR = new Date().getFullYear()
+const MIN_YEAR = CURRENT_YEAR - 15
+
+const selectClass =
+  "h-12 w-full appearance-none rounded-4xl border border-input bg-input/30 px-5 py-2.5 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 md:text-sm"
+
+export function ApplicationSection() {
+  const {
+    selectedProductId,
+    setSelectedProductId,
+    loanAmount,
+    setLoanAmount,
+    repaymentPeriod,
+    setRepaymentPeriod,
+  } = useLanding()
+  const [borrower, setBorrower] = useState("firma-start")
+  const [yearError, setYearError] = useState("")
+
+  const selectedProduct = PRODUCTS.find((p) => p.id === selectedProductId)!
+  const isSmartPlan = selectedProduct.id === "smart-plan"
+  const borrowerOptions = isSmartPlan ? BORROWER_WITH_PERSON : BORROWER_BASE
+
+  const handleProductChange = (id: string) => {
+    setSelectedProductId(id)
+    if (id !== "smart-plan" && borrower === "osoba-fizyczna") {
+      setBorrower("firma-start")
+    }
+  }
+
+  const handleYearBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    if (!val) {
+      setYearError("")
+      return
+    }
+    const year = Number(val)
+    if (year < MIN_YEAR) {
+      setYearError(
+        `Finansujemy pojazdy nie starsze niż ${MIN_YEAR} rok produkcji.`
+      )
+    } else if (year > CURRENT_YEAR) {
+      setYearError("Rok produkcji nie może być z przyszłości.")
+    } else {
+      setYearError("")
+    }
+  }
+
+  return (
+    <Section id="wniosek">
+      <SectionHeading
+        title="Złóż wniosek"
+        subtitle="Wypełnij formularz, a my skontaktujemy się z Tobą w ciągu 24 godzin."
+      />
+
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className="mx-auto mt-10 max-w-3xl space-y-10"
+      >
+        {/* Product & borrower */}
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="app-product">Produkt</Label>
+              <Link
+                href="#oferta"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Nie wiesz, który wybrać?
+                <ArrowUpRight className="size-3" />
+              </Link>
+            </div>
+            <div className="relative">
+              <select
+                id="app-product"
+                value={selectedProductId}
+                onChange={(e) => handleProductChange(e.target.value)}
+                className={selectClass}
+              >
+                {PRODUCTS.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                <span
+                  className={cn(
+                    "size-2.5 rounded-full",
+                    COLOR_MAP[selectedProduct.color].dot
+                  )}
+                />
+                <ChevronDown className="size-4 text-muted-foreground" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="app-borrower">Kto pożycza?</Label>
+            <div className="relative">
+              <select
+                id="app-borrower"
+                value={borrower}
+                onChange={(e) => setBorrower(e.target.value)}
+                className={selectClass}
+              >
+                {borrowerOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            </div>
+          </div>
+        </div>
+
+        {/* Personal info */}
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="app-name">Imię i nazwisko</Label>
+            <Input id="app-name" placeholder="Jan Kowalski" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="app-phone">Telefon</Label>
+            <Input id="app-phone" type="tel" placeholder="+48 000 000 000" />
+          </div>
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="app-email">Adres e-mail</Label>
+            <Input id="app-email" type="email" placeholder="jan@firma.pl" />
+          </div>
+        </div>
+
+        {/* Loan details */}
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="app-amount">Kwota pożyczki (PLN)</Label>
+            <Input
+              id="app-amount"
+              type="text"
+              inputMode="numeric"
+              placeholder="50 000"
+              value={loanAmount}
+              onChange={(e) => setLoanAmount(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="app-term">Okres spłaty (miesiące)</Label>
+            <Input
+              id="app-term"
+              type="number"
+              inputMode="numeric"
+              placeholder="6–48"
+              min={6}
+              max={48}
+              value={repaymentPeriod}
+              onChange={(e) => setRepaymentPeriod(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Purpose */}
+        <div className="space-y-2">
+          <Label htmlFor="app-purpose">Cel pożyczki</Label>
+          <Textarea
+            id="app-purpose"
+            placeholder="Opisz krótko, na co potrzebujesz finansowania..."
+            className="min-h-24"
+          />
+        </div>
+
+        {/* Vehicle info */}
+        <div className="space-y-5">
+          <h3 className="text-lg font-medium">Informacje o pojeździe</h3>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="app-brand">Marka</Label>
+              <Input id="app-brand" placeholder="np. BMW" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="app-model">Model</Label>
+              <Input id="app-model" placeholder="np. Seria 3" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="app-year">Rok produkcji</Label>
+              <Input
+                id="app-year"
+                type="number"
+                placeholder={String(CURRENT_YEAR)}
+                min={MIN_YEAR}
+                max={CURRENT_YEAR}
+                onBlur={handleYearBlur}
+                onChange={() => yearError && setYearError("")}
+                aria-invalid={!!yearError}
+              />
+              {yearError && (
+                <p className="text-sm text-destructive">{yearError}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="app-mileage">Przebieg (km)</Label>
+              <Input id="app-mileage" type="number" placeholder="80 000" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="app-body">Rodzaj nadwozia</Label>
+              <div className="relative">
+                <select id="app-body" className={selectClass} defaultValue="">
+                  <option value="" disabled>
+                    Wybierz...
+                  </option>
+                  {BODY_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="app-fuel">Rodzaj paliwa</Label>
+              <div className="relative">
+                <select id="app-fuel" className={selectClass} defaultValue="">
+                  <option value="" disabled>
+                    Wybierz...
+                  </option>
+                  {FUEL_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Submit */}
+        <Button type="submit" size="lg" className="w-full sm:w-auto">
+          Złóż wniosek
+        </Button>
+      </form>
+    </Section>
+  )
+}
