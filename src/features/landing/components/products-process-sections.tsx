@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { ChevronDown, ChevronRight } from "lucide-react"
+import { ArrowDown, ArrowRight, ChevronDown, ChevronRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Section } from "@/components/section"
 import { SectionHeading } from "@/components/section-heading"
 import { useLanding } from "../context/landing-context"
@@ -19,31 +20,35 @@ import { PRODUCTS, type ProductColor } from "../constants/products"
 
 const COLOR_CLASSES: Record<
   ProductColor,
-  { accent: string; ring: string; number: string; tileBg: string }
+  { accent: string; ring: string; number: string; tileBg: string; btn: string }
 > = {
   violet: {
     accent: "text-brand-500",
     ring: "ring-brand-500",
     number: "text-brand-200",
     tileBg: "bg-brand-50",
+    btn: "bg-brand-500 hover:bg-brand-600",
   },
   lime: {
     accent: "text-brand2-700",
     ring: "ring-brand2-700",
     number: "text-brand2-300",
     tileBg: "bg-brand2-50",
+    btn: "bg-brand2-700 hover:bg-brand2-800",
   },
   plum: {
     accent: "text-brand-800",
     ring: "ring-brand-800",
     number: "text-brand-300",
     tileBg: "bg-brand-100",
+    btn: "bg-brand-800 hover:bg-brand-900",
   },
   olive: {
     accent: "text-brand2-900",
     ring: "ring-brand2-800",
     number: "text-brand2-400",
     tileBg: "bg-brand2-100",
+    btn: "bg-brand2-900 hover:bg-brand2-950",
   },
 }
 
@@ -83,11 +88,11 @@ export function ProductsProcessSections() {
         <SectionHeading
           title={
             <>
-              Dopasuj <span className="text-brand-900">ofertę</span> do swoich
-              potrzeb
+              Trzy sposoby na{" "}
+              <span className="text-brand-900">finansowanie</span>
             </>
           }
-          subtitle="Wybierz produkt, który najlepiej odpowiada Twojej sytuacji."
+          subtitle="Dopasuj produkt do swojej sytuacji. Każda opcja to inna forma współpracy — wybierz tę, która Ci odpowiada."
         />
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -96,52 +101,43 @@ export function ProductsProcessSections() {
             const pColors = COLOR_CLASSES[product.color]
 
             return (
-              <button
+              <Card
                 key={product.id}
                 onClick={() => handleSelect(product.id)}
-                className="group text-left"
+                className={cn(
+                  "flex h-full cursor-pointer flex-col shadow-sm transition-all duration-200",
+                  isSelected
+                    ? cn("ring-2 shadow-md", pColors.ring)
+                    : ""
+                )}
               >
-                <Card
-                  className={cn(
-                    "h-full cursor-pointer shadow-sm transition-all duration-200",
-                    isSelected
-                      ? cn("ring-2 shadow-md", pColors.ring)
-                      : "hover:border-border/80 hover:bg-muted/40"
-                  )}
-                >
-                  <CardHeader>
-                    <product.icon
-                      className={cn("mb-1 size-6", pColors.accent)}
-                    />
-                    <CardTitle className={cn("text-xl", pColors.accent)}>
-                      {product.name}
-                    </CardTitle>
-                    <CardDescription>{product.tagline}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-base text-muted-foreground">
-                      {product.description}
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1.5 text-sm font-medium transition-colors",
-                        isSelected
-                          ? pColors.accent
-                          : "text-muted-foreground"
-                      )}
-                    >
-                      Zobacz kroki
-                      {isSelected ? (
-                        <ChevronDown className="size-4" />
-                      ) : (
-                        <ChevronRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
-                      )}
-                    </span>
-                  </CardFooter>
-                </Card>
-              </button>
+                <CardHeader>
+                  <product.icon
+                    className={cn("mb-1 size-6", pColors.accent)}
+                  />
+                  <CardTitle className={cn("text-xl", pColors.accent)}>
+                    {product.name}
+                  </CardTitle>
+                  <CardDescription>{product.tagline}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <p className="text-base text-muted-foreground">
+                    {product.description}
+                  </p>
+                </CardContent>
+                <CardFooter className="justify-end">
+                  <Button
+                    onClick={() => handleSelect(product.id)}
+                    className={cn(
+                      "text-white",
+                      pColors.btn
+                    )}
+                  >
+                    Zobacz kroki
+                    <ArrowDown className="ml-2 size-4" />
+                  </Button>
+                </CardFooter>
+              </Card>
             )
           })}
         </div>

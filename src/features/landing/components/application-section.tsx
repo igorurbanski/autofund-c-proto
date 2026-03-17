@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { ChevronDown, ArrowUpRight } from "lucide-react"
 import { Section } from "@/components/section"
@@ -58,14 +58,25 @@ export function ApplicationSection() {
     repaymentPeriod,
     setRepaymentPeriod,
   } = useLanding()
+  const [appProductId, setAppProductId] = useState("")
   const [borrower, setBorrower] = useState("firma-start")
   const [yearError, setYearError] = useState("")
 
-  const selectedProduct = PRODUCTS.find((p) => p.id === selectedProductId)!
-  const isSmartPlan = selectedProduct.id === "smart-plan"
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    setAppProductId(selectedProductId)
+  }, [selectedProductId])
+
+  const selectedProduct = PRODUCTS.find((p) => p.id === appProductId)
+  const isSmartPlan = selectedProduct?.id === "smart-plan"
   const borrowerOptions = isSmartPlan ? BORROWER_WITH_PERSON : BORROWER_BASE
 
   const handleProductChange = (id: string) => {
+    setAppProductId(id)
     setSelectedProductId(id)
     if (id !== "smart-plan" && borrower === "osoba-fizyczna") {
       setBorrower("firma-start")
@@ -117,10 +128,13 @@ export function ApplicationSection() {
             <div className="relative">
               <select
                 id="app-product"
-                value={selectedProductId}
+                value={appProductId}
                 onChange={(e) => handleProductChange(e.target.value)}
                 className={selectClass}
               >
+                <option value="" disabled>
+                  Wybierz
+                </option>
                 {PRODUCTS.map((product) => (
                   <option key={product.id} value={product.id}>
                     {product.name}
@@ -128,12 +142,14 @@ export function ApplicationSection() {
                 ))}
               </select>
               <div className="pointer-events-none absolute right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
-                <span
-                  className={cn(
-                    "size-2.5 rounded-full",
-                    COLOR_MAP[selectedProduct.color].dot
-                  )}
-                />
+                {selectedProduct && (
+                  <span
+                    className={cn(
+                      "size-2.5 rounded-full",
+                      COLOR_MAP[selectedProduct.color].dot
+                    )}
+                  />
+                )}
                 <ChevronDown className="size-4 text-muted-foreground" />
               </div>
             </div>

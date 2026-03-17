@@ -55,9 +55,9 @@ export function HeroForm() {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl">Sprawdź swoją ofertę</CardTitle>
+        <CardTitle className="text-xl">Sprawdź koszty swojej pożyczki</CardTitle>
         <CardDescription>
-          Wypełnij formularz — przygotujemy ofertę dopasowaną do Twoich potrzeb.
+          Podaj parametry i wygeneruj harmonogram spłaty — zobaczysz dokładne raty, odsetki i całkowity koszt. Bez zobowiązań.
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-2">
@@ -130,7 +130,7 @@ export function HeroForm() {
           </div>
 
           <Button type="submit" className="w-full md:w-auto">
-            Złóż wniosek
+            Wygeneruj harmonogram
           </Button>
         </form>
       </CardContent>
