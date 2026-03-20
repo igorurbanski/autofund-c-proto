@@ -11,7 +11,7 @@ export function HeroSection() {
       <div className="relative z-10">
         <div className="pointer-events-none absolute -top-16 -bottom-16 right-0 hidden w-1/2 lg:block">
           <Image
-            src="/3d-car-front-quarter-view.png"
+            src="/human.png"
             alt=""
             fill
             priority
@@ -40,7 +40,7 @@ export function HeroSection() {
 
           <div className="relative -mr-6 mt-6 ml-auto aspect-4/3 w-[calc(100%+1.5rem)] max-w-[512px] md:mt-0 lg:hidden">
             <Image
-              src="/3d-car-front-quarter-view.png"
+              src="/human.png"
               alt=""
               fill
               className="object-contain object-right"

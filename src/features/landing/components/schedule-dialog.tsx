@@ -1,0 +1,194 @@
+"use client"
+
+import { useCallback, useEffect, useRef, useState } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { cn } from "@/lib/utils"
+import type { ScheduleResult } from "../utils/schedule-calculator"
+
+type ScheduleDialogProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  data: ScheduleResult | null
+}
+
+function fmt(n: number) {
+  return n.toLocaleString("pl-PL", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
+
+function getEarlyRepaymentHighlights(data: ScheduleResult) {
+  const highlights: { month: number; amount: number }[] = []
+  const { rows } = data
+  const periodsCount = Math.ceil(rows.length / 12)
+
+  for (let p = 0; p < periodsCount - 1; p++) {
+    const lastIdx = Math.min((p + 1) * 12, rows.length) - 1
+    const row = rows[lastIdx]
+    if (row.earlyRepayment !== null && row.earlyRepayment > 0) {
+      highlights.push({ month: row.month, amount: row.earlyRepayment })
+    }
+  }
+  return highlights
+}
+
+function useScrollShadow() {
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  const check = useCallback(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+    const scrollEl = wrapper.querySelector<HTMLElement>(
+      '[data-slot="table-container"]'
+    )
+    if (!scrollEl) return
+    setCanScrollRight(
+      scrollEl.scrollWidth > scrollEl.clientWidth + scrollEl.scrollLeft + 1
+    )
+  }, [])
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+    const scrollEl = wrapper.querySelector<HTMLElement>(
+      '[data-slot="table-container"]'
+    )
+    if (!scrollEl) return
+
+    check()
+    scrollEl.addEventListener("scroll", check, { passive: true })
+    const ro = new ResizeObserver(check)
+    ro.observe(scrollEl)
+    return () => {
+      scrollEl.removeEventListener("scroll", check)
+      ro.disconnect()
+    }
+  }, [check])
+
+  return { wrapperRef, canScrollRight }
+}
+
+export function ScheduleDialog({ open, onOpenChange, data }: ScheduleDialogProps) {
+  const { wrapperRef, canScrollRight } = useScrollShadow()
+
+  if (!data) return null
+
+  const { summary, rows } = data
+  const highlights = getEarlyRepaymentHighlights(data)
+
+  const summaryItems = [
+    { label: "Kwota do wypłaty", value: `${fmt(summary.netLoan)} PLN` },
+    { label: "Okres spłaty", value: `${summary.months} mies.` },
+    { label: "Rata miesięczna", value: `${fmt(summary.monthlyPayment)} PLN` },
+    { label: "Prowizja", value: `${fmt(summary.prowizja)} PLN` },
+    { label: "Suma odsetek", value: `${fmt(summary.totalInterest)} PLN` },
+    { label: "Całkowity koszt", value: `${fmt(summary.totalPayments)} PLN` },
+  ]
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>Harmonogram spłaty</DialogTitle>
+          <DialogDescription>
+            {summary.months} równych, miesięcznych rat kapitałowo-odsetkowych
+            z możliwością wcześniejszej spłaty na preferencyjnych warunkach.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {summaryItems.map((item) => (
+            <div key={item.label} className="rounded-xl bg-muted/50 px-4 py-3">
+              <p className="text-xs text-muted-foreground">{item.label}</p>
+              <p className="text-base font-semibold tracking-tight">
+                {item.value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {highlights.length > 0 && (
+          <div className="rounded-xl border border-brand-200 bg-brand-50/50 px-4 py-3">
+            <p className="mb-1 text-sm font-medium">
+              Preferencyjne warunki wcześniejszej spłaty
+            </p>
+            <ul className="space-y-0.5 text-sm text-muted-foreground">
+              {highlights.map((h) => (
+                <li key={h.month}>
+                  Spłata całkowita w {h.month} mies:{" "}
+                  <span className="font-medium text-foreground">
+                    {fmt(h.amount)} PLN
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div ref={wrapperRef} className="relative -mx-6 border-t">
+          <Table>
+            <TableHeader className="sticky top-0 z-10 bg-background">
+              <TableRow>
+                <TableHead className="w-12">Nr</TableHead>
+                <TableHead>Odsetki</TableHead>
+                <TableHead>Kapitał</TableHead>
+                <TableHead>Rata</TableHead>
+                <TableHead className="text-right">Spłata całkowita</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.month}>
+                  <TableCell className="tabular-nums">{row.month}</TableCell>
+                  <TableCell className="tabular-nums">
+                    {fmt(row.interest)}
+                  </TableCell>
+                  <TableCell className="tabular-nums">
+                    {fmt(row.principal)}
+                  </TableCell>
+                  <TableCell className="tabular-nums">
+                    {fmt(row.payment)}
+                  </TableCell>
+                  <TableCell className="tabular-nums text-right">
+                    {row.earlyRepayment !== null
+                      ? fmt(row.earlyRepayment)
+                      : "–"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div
+            className={cn(
+              "pointer-events-none absolute top-0 right-0 bottom-0 w-8 bg-linear-to-l from-background to-transparent transition-opacity duration-150",
+              canScrollRight ? "opacity-100" : "opacity-0"
+            )}
+          />
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          Powyższe wyliczenie pełni funkcję poglądową, nie stanowi oferty
+          w rozumieniu art. 66, ust. 1 Kodeksu Cywilnego. Preferencyjne warunki
+          wcześniejszej spłaty są dedykowane wyłącznie pożyczkobiorcom terminowym,
+          nie posiadającym zaległości w spłatach rat.
+        </p>
+      </DialogContent>
+    </Dialog>
+  )
+}

@@ -1,10 +1,12 @@
 import { Section } from "@/components/section"
 
+const YEARS_ON_MARKET = new Date().getFullYear() - 2014
+
 const FACTS = [
   {
-    value: "15+",
+    value: `${YEARS_ON_MARKET}+`,
     label: "lat na rynku",
-    text: "Działamy nieprzerwanie od 2010 roku — znamy rynek i jego zasady.",
+    text: "Działamy nieprzerwanie od 2014 roku — znamy rynek i jego zasady.",
   },
   {
     value: "0",

@@ -47,7 +47,7 @@ const CURRENT_YEAR = new Date().getFullYear()
 const MIN_YEAR = CURRENT_YEAR - 15
 
 const selectClass =
-  "h-12 w-full appearance-none rounded-4xl border border-input bg-input/30 px-5 py-2.5 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 md:text-sm"
+  "h-12 w-full appearance-none rounded-4xl border border-input bg-input/30 pl-5 pr-12 py-2.5 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 md:text-sm"
 
 export function ApplicationSection() {
   const {
@@ -61,6 +61,8 @@ export function ApplicationSection() {
   const [appProductId, setAppProductId] = useState("")
   const [borrower, setBorrower] = useState("firma-start")
   const [yearError, setYearError] = useState("")
+  const [emailError, setEmailError] = useState("")
+  const [termError, setTermError] = useState("")
 
   const isFirstRender = useRef(true)
   useEffect(() => {
@@ -73,6 +75,9 @@ export function ApplicationSection() {
 
   const selectedProduct = PRODUCTS.find((p) => p.id === appProductId)
   const isSmartPlan = selectedProduct?.id === "smart-plan"
+  const isAutoPark = appProductId === "auto-park"
+  const termMin = isAutoPark ? 1 : 6
+  const termMax = isAutoPark ? 6 : 48
   const borrowerOptions = isSmartPlan ? BORROWER_WITH_PERSON : BORROWER_BASE
 
   const handleProductChange = (id: string) => {
@@ -81,6 +86,9 @@ export function ApplicationSection() {
     if (id !== "smart-plan" && borrower === "osoba-fizyczna") {
       setBorrower("firma-start")
     }
+    const newMin = id === "auto-park" ? 1 : 6
+    const newMax = id === "auto-park" ? 6 : 48
+    if (repaymentPeriod) validateTerm(repaymentPeriod, newMin, newMax)
   }
 
   const handleYearBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -101,6 +109,53 @@ export function ApplicationSection() {
     }
   }
 
+  const validateEmail = (val: string) => {
+    if (!val) {
+      setEmailError("")
+      return
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+      setEmailError("Podaj poprawny adres e-mail.")
+    } else {
+      setEmailError("")
+    }
+  }
+
+  const validateTerm = (val: string, min = termMin, max = termMax) => {
+    if (!val) {
+      setTermError("")
+      return
+    }
+    const num = Number(val)
+    if (isNaN(num) || !Number.isInteger(num)) {
+      setTermError("Podaj liczbę całkowitą.")
+    } else if (num < min) {
+      setTermError(`Minimalny okres spłaty to ${min} ${min === 1 ? "miesiąc" : "miesięcy"}.`)
+    } else if (num > max) {
+      setTermError(`Maksymalny okres spłaty to ${max} miesięcy.`)
+    } else {
+      setTermError("")
+    }
+  }
+
+  const handleEnterNav = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key !== "Enter") return
+    const target = e.target as HTMLElement
+    if (target.tagName === "TEXTAREA" || target.tagName === "BUTTON") return
+
+    e.preventDefault()
+    const focusable = Array.from(
+      e.currentTarget.querySelectorAll<HTMLElement>(
+        "input, select, textarea, button[type='submit']"
+      )
+    ).filter((el) => !(el as HTMLInputElement).disabled && el.tabIndex !== -1)
+
+    const idx = focusable.indexOf(target as HTMLElement)
+    if (idx >= 0 && idx < focusable.length - 1) {
+      focusable[idx + 1].focus()
+    }
+  }
+
   return (
     <Section id="wniosek">
       <SectionHeading
@@ -109,6 +164,8 @@ export function ApplicationSection() {
       />
 
       <form
+        noValidate
+        onKeyDown={handleEnterNav}
         onSubmit={(e) => e.preventDefault()}
         className="mx-auto mt-10 max-w-3xl space-y-10"
       >
@@ -130,14 +187,14 @@ export function ApplicationSection() {
                 id="app-product"
                 value={appProductId}
                 onChange={(e) => handleProductChange(e.target.value)}
-                className={selectClass}
+                className={cn(selectClass, "pr-16")}
               >
                 <option value="" disabled>
-                  Wybierz
+                  Wybierz...
                 </option>
                 {PRODUCTS.map((product) => (
                   <option key={product.id} value={product.id}>
-                    {product.name}
+                    {product.name} — {product.tagline}
                   </option>
                 ))}
               </select>
@@ -183,11 +240,22 @@ export function ApplicationSection() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="app-phone">Telefon</Label>
-            <Input id="app-phone" type="tel" placeholder="+48 000 000 000" />
+            <Input id="app-phone" type="text" inputMode="tel" placeholder="+48 000 000 000" />
           </div>
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="app-email">Adres e-mail</Label>
-            <Input id="app-email" type="email" placeholder="jan@firma.pl" />
+            <Input
+              id="app-email"
+              type="text"
+              inputMode="email"
+              placeholder="jan@firma.pl"
+              onBlur={(e) => validateEmail(e.target.value)}
+              onChange={(e) => emailError && validateEmail(e.target.value)}
+              aria-invalid={!!emailError}
+            />
+            {emailError && (
+              <p className="text-sm text-destructive">{emailError}</p>
+            )}
           </div>
         </div>
 
@@ -208,14 +276,20 @@ export function ApplicationSection() {
             <Label htmlFor="app-term">Okres spłaty (miesiące)</Label>
             <Input
               id="app-term"
-              type="number"
+              type="text"
               inputMode="numeric"
-              placeholder="6–48"
-              min={6}
-              max={48}
+              placeholder={`${termMin}–${termMax}`}
               value={repaymentPeriod}
-              onChange={(e) => setRepaymentPeriod(e.target.value)}
+              onChange={(e) => {
+                setRepaymentPeriod(e.target.value)
+                if (termError) validateTerm(e.target.value)
+              }}
+              onBlur={(e) => validateTerm(e.target.value)}
+              aria-invalid={!!termError}
             />
+            {termError && (
+              <p className="text-sm text-destructive">{termError}</p>
+            )}
           </div>
         </div>
 
@@ -245,10 +319,9 @@ export function ApplicationSection() {
               <Label htmlFor="app-year">Rok produkcji</Label>
               <Input
                 id="app-year"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 placeholder={String(CURRENT_YEAR)}
-                min={MIN_YEAR}
-                max={CURRENT_YEAR}
                 onBlur={handleYearBlur}
                 onChange={() => yearError && setYearError("")}
                 aria-invalid={!!yearError}
@@ -259,7 +332,7 @@ export function ApplicationSection() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="app-mileage">Przebieg (km)</Label>
-              <Input id="app-mileage" type="number" placeholder="80 000" />
+              <Input id="app-mileage" type="text" inputMode="numeric" placeholder="80 000" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="app-body">Rodzaj nadwozia</Label>
@@ -293,8 +366,40 @@ export function ApplicationSection() {
                 <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="app-damaged">Czy pojazd jest uszkodzony?</Label>
+              <div className="relative">
+                <select id="app-damaged" className={selectClass} defaultValue="">
+                  <option value="" disabled>
+                    Wybierz...
+                  </option>
+                  <option value="nie">Nie</option>
+                  <option value="tak">Tak</option>
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* RODO consent */}
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            className="mt-1 size-4 shrink-0 accent-primary"
+          />
+          <span className="text-sm text-muted-foreground">
+            Wyrażam zgodę na przetwarzanie moich danych osobowych przez AutoFund
+            w celu rozpatrzenia wniosku o pożyczkę, zgodnie z{" "}
+            <Link
+              href="/polityka-prywatnosci"
+              className="underline underline-offset-2 transition-colors hover:text-foreground"
+            >
+              Polityką Prywatności
+            </Link>
+            .
+          </span>
+        </label>
 
         {/* Submit */}
         <Button type="submit" size="lg" className="w-full sm:w-auto">
