@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -19,7 +20,13 @@ import { PRODUCT_LOAN_CONFIG, TERM_OPTIONS, EARLY_REPAY_COEFF1 } from "../consta
 import { calculateSchedule, type ScheduleResult } from "../utils/schedule-calculator"
 import { ScheduleDialog } from "./schedule-dialog"
 
-const MAX_LTV = 0.8
+const MAX_LTV: Record<string, number> = {
+  "auto-drive": 0.8,
+  "auto-start": 0.8,
+  "auto-park": 0.4,
+  "smart-plan": 0.8,
+}
+const DEFAULT_LTV = 0.8
 
 const TILE_LABELS: Record<string, { title: string; desc: string }> = {
   "auto-drive": { title: "Pożyczka pod pojazd", desc: "Jeździsz dalej — auto jest zabezpieczeniem" },
@@ -62,15 +69,18 @@ export function HeroForm() {
 
   const termOptions = TERM_OPTIONS[selectedProductId] ?? []
 
-  const validateLoan = (loan: string, vehicle: string) => {
+  const getMaxLtv = (productId: string) => MAX_LTV[productId] ?? DEFAULT_LTV
+
+  const validateLoan = (loan: string, vehicle: string, productId: string = selectedProductId) => {
     const loanNum = parseNumeric(loan)
     const vehicleNum = parseNumeric(vehicle)
     if (!loanNum || !vehicleNum) {
       setLoanError("")
       return
     }
-    if (loanNum > vehicleNum * MAX_LTV) {
-      setLoanError("Kwota pożyczki nie może przekraczać 80% wartości pojazdu.")
+    const ltv = getMaxLtv(productId)
+    if (loanNum > vehicleNum * ltv) {
+      setLoanError(`Kwota pożyczki nie może przekraczać ${Math.round(ltv * 100)}% wartości pojazdu.`)
     } else {
       setLoanError("")
     }
@@ -81,6 +91,9 @@ export function HeroForm() {
     const newTerms = TERM_OPTIONS[id] ?? []
     if (repaymentPeriod && !newTerms.includes(Number(repaymentPeriod))) {
       setRepaymentPeriod("")
+    }
+    if (loanAmount && vehicleValue) {
+      validateLoan(loanAmount, vehicleValue, id)
     }
   }
 
@@ -109,7 +122,7 @@ export function HeroForm() {
 
     if (vehicleValue) {
       const vehicleNum = parseNumeric(vehicleValue)
-      if (vehicleNum && loanNum > vehicleNum * MAX_LTV) return false
+      if (vehicleNum && loanNum > vehicleNum * getMaxLtv(selectedProductId)) return false
     }
 
     return true
@@ -168,7 +181,7 @@ export function HeroForm() {
                 <RadioGroupItem value={product.id} className={cn("absolute top-3 right-3", colors.radio)} />
                 <div className="grid gap-0.5">
                   <span className={cn("text-sm font-medium leading-tight", colors.title)}>{label.title}</span>
-                  <span className="text-xs leading-snug text-muted-foreground">{label.desc}</span>
+                  <span className="text-sm leading-snug text-muted-foreground">{label.desc}</span>
                 </div>
               </label>
             )
@@ -237,19 +250,22 @@ export function HeroForm() {
 
           <div className="grid gap-2.5">
             <Label htmlFor="repayment-period">Okres spłaty</Label>
-            <select
-              id="repayment-period"
-              value={repaymentPeriod}
-              onChange={(e) => setRepaymentPeriod(e.target.value)}
-              className="h-12 w-full appearance-none rounded-4xl border border-input bg-input/30 px-5 text-base outline-none focus:border-ring focus:ring-1 focus:ring-ring"
-            >
-              <option value="">Wybierz okres</option>
-              {termOptions.map((m) => (
-                <option key={m} value={String(m)}>
-                  {m} {formatMonths(m)}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="repayment-period"
+                value={repaymentPeriod}
+                onChange={(e) => setRepaymentPeriod(e.target.value)}
+                className="h-12 w-full appearance-none rounded-4xl border border-input bg-input/30 pl-5 pr-12 py-2.5 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
+              >
+                <option value="">Wybierz okres</option>
+                {termOptions.map((m) => (
+                  <option key={m} value={String(m)}>
+                    {m} {formatMonths(m)}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            </div>
           </div>
 
           <div className="grid gap-2.5">

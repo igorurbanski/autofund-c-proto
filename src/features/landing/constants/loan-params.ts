@@ -39,6 +39,10 @@ export const TERM_OPTIONS: Record<string, number[]> = {
   "smart-plan": [6, 12, 18, 24, 36, 48],
 }
 
+export const ALL_TERM_OPTIONS = [
+  ...new Set(Object.values(TERM_OPTIONS).flat()),
+].sort((a, b) => a - b)
+
 export const EARLY_REPAY_COEFF1: Record<number, number> = {
   18: 30.95,
   24: 31.95,

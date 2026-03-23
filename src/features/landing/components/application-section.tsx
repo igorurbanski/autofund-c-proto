@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { PRODUCTS, type ProductColor } from "../constants/products"
+import { TERM_OPTIONS, ALL_TERM_OPTIONS } from "../constants/loan-params"
 import { useLanding } from "../context/landing-context"
 
 const COLOR_MAP: Record<ProductColor, { dot: string }> = {
@@ -62,7 +63,6 @@ export function ApplicationSection() {
   const [borrower, setBorrower] = useState("firma-start")
   const [yearError, setYearError] = useState("")
   const [emailError, setEmailError] = useState("")
-  const [termError, setTermError] = useState("")
 
   const isFirstRender = useRef(true)
   useEffect(() => {
@@ -75,9 +75,6 @@ export function ApplicationSection() {
 
   const selectedProduct = PRODUCTS.find((p) => p.id === appProductId)
   const isSmartPlan = selectedProduct?.id === "smart-plan"
-  const isAutoPark = appProductId === "auto-park"
-  const termMin = isAutoPark ? 1 : 6
-  const termMax = isAutoPark ? 6 : 48
   const borrowerOptions = isSmartPlan ? BORROWER_WITH_PERSON : BORROWER_BASE
 
   const handleProductChange = (id: string) => {
@@ -86,9 +83,10 @@ export function ApplicationSection() {
     if (id !== "smart-plan" && borrower === "osoba-fizyczna") {
       setBorrower("firma-start")
     }
-    const newMin = id === "auto-park" ? 1 : 6
-    const newMax = id === "auto-park" ? 6 : 48
-    if (repaymentPeriod) validateTerm(repaymentPeriod, newMin, newMax)
+    const newTerms = TERM_OPTIONS[id] ?? []
+    if (repaymentPeriod && !newTerms.includes(Number(repaymentPeriod))) {
+      setRepaymentPeriod("")
+    }
   }
 
   const handleYearBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -118,23 +116,6 @@ export function ApplicationSection() {
       setEmailError("Podaj poprawny adres e-mail.")
     } else {
       setEmailError("")
-    }
-  }
-
-  const validateTerm = (val: string, min = termMin, max = termMax) => {
-    if (!val) {
-      setTermError("")
-      return
-    }
-    const num = Number(val)
-    if (isNaN(num) || !Number.isInteger(num)) {
-      setTermError("Podaj liczbę całkowitą.")
-    } else if (num < min) {
-      setTermError(`Minimalny okres spłaty to ${min} ${min === 1 ? "miesiąc" : "miesięcy"}.`)
-    } else if (num > max) {
-      setTermError(`Maksymalny okres spłaty to ${max} miesięcy.`)
-    } else {
-      setTermError("")
     }
   }
 
@@ -273,23 +254,25 @@ export function ApplicationSection() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="app-term">Okres spłaty (miesiące)</Label>
-            <Input
-              id="app-term"
-              type="text"
-              inputMode="numeric"
-              placeholder={`${termMin}–${termMax}`}
-              value={repaymentPeriod}
-              onChange={(e) => {
-                setRepaymentPeriod(e.target.value)
-                if (termError) validateTerm(e.target.value)
-              }}
-              onBlur={(e) => validateTerm(e.target.value)}
-              aria-invalid={!!termError}
-            />
-            {termError && (
-              <p className="text-sm text-destructive">{termError}</p>
-            )}
+            <Label htmlFor="app-term">Okres spłaty</Label>
+            <div className="relative">
+              <select
+                id="app-term"
+                value={repaymentPeriod}
+                onChange={(e) => setRepaymentPeriod(e.target.value)}
+                className={selectClass}
+              >
+                <option value="" disabled>
+                  Wybierz...
+                </option>
+                {(appProductId ? TERM_OPTIONS[appProductId] ?? [] : ALL_TERM_OPTIONS).map((m) => (
+                  <option key={m} value={String(m)}>
+                    {m} {m === 1 ? "miesiąc" : m >= 2 && m <= 4 ? "miesiące" : "miesięcy"}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            </div>
           </div>
         </div>
 
