@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 
-const instrumentSans = Instrument_Sans({
-  variable: "--font-instrument-sans",
+const geist = Geist({
+  variable: "--font-geist",
   subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin", "latin-ext"],
 });
 
 const geistMono = Geist_Mono({
@@ -30,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" className={`${instrumentSans.variable} ${geistMono.variable}`}>
+    <html lang="pl" className={`${geist.variable} ${inter.variable} ${geistMono.variable}`}>
       <body className="antialiased">
         <TooltipProvider>
           <Navbar />

@@ -105,7 +105,7 @@ export function ScheduleDialog({ open, onOpenChange, data }: ScheduleDialogProps
           {summaryItems.map((item) => (
             <div key={item.label} className="rounded-xl bg-muted/50 px-4 py-3">
               <p className="text-xs text-muted-foreground">{item.label}</p>
-              <p className="text-base font-semibold tracking-tight">
+              <p className="text-base font-bold tracking-tight">
                 {item.value}
               </p>
             </div>
@@ -114,14 +114,14 @@ export function ScheduleDialog({ open, onOpenChange, data }: ScheduleDialogProps
 
         {highlights.length > 0 && (
           <div className="rounded-xl border border-brand-200 bg-brand-50/50 px-4 py-3">
-            <p className="mb-1 text-sm font-medium">
+            <p className="mb-1 text-sm font-semibold">
               Preferencyjne warunki wcześniejszej spłaty
             </p>
             <ul className="space-y-0.5 text-sm text-muted-foreground">
               {highlights.map((h) => (
                 <li key={h.month}>
                   Spłata całkowita w {h.month} mies:{" "}
-                  <span className="font-medium text-foreground">
+                  <span className="font-semibold text-foreground">
                     {fmt(h.amount)} PLN
                   </span>
                 </li>

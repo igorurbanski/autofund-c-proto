@@ -30,7 +30,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Zabezpiecz pożyczkę swoim pojazdem i korzystaj z niego bez ograniczeń. Idealne, gdy potrzebujesz gotówki, ale nie chcesz rezygnować z auta.",
     icon: Car,
-    color: "violet",
+    color: "plum",
     steps: [
       {
         title: "Skontaktuj się z nami",
@@ -104,7 +104,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Zostaw pojazd na naszym strzeżonym placu, a odbierz go po spłacie. Minimum formalności, maksimum szybkości.",
     icon: Timer,
-    color: "plum",
+    color: "violet",
     steps: [
       {
         title: "Kontakt",

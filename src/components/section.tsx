@@ -10,7 +10,7 @@ export function Section({
     <section className={cn("py-section", className)} {...props}>
       <div
         className={cn(
-          "mx-auto px-6",
+          "mx-auto px-5",
           narrow ? "max-w-narrow" : "max-w-container"
         )}
       >

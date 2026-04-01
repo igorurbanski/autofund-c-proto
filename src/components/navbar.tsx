@@ -32,7 +32,7 @@ export function Navbar() {
         scrolled ? "border-border bg-background/95 backdrop-blur-sm" : "border-transparent bg-transparent"
       )}
     >
-      <nav className="mx-auto flex h-16 max-w-container items-center justify-between px-6">
+        <nav className="mx-auto flex h-16 max-w-container items-center justify-between px-5">
         <Link href="/" className="shrink-0">
           <Image
             src="/logo-autofund-dark.svg"
@@ -56,7 +56,7 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-4 lg:flex">
           <Button>Złóż wniosek</Button>
         </div>
 
@@ -74,7 +74,7 @@ export function Navbar() {
 
       {mobileOpen && (
         <div className="lg:hidden">
-          <ul className="mx-auto max-w-container space-y-1 px-6 py-4">
+          <ul className="mx-auto max-w-container space-y-1 px-5 py-4">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <Link

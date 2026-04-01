@@ -67,7 +67,7 @@ function FaqItem({
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between py-5 text-left text-base font-medium transition-colors hover:text-brand-700"
+        className="flex w-full items-center justify-between py-5 text-left text-base font-semibold transition-colors hover:text-brand-700"
       >
         {q}
         <ChevronDown
@@ -98,18 +98,18 @@ export function FaqSection() {
     <section className="relative overflow-hidden py-section">
       <div className="pointer-events-none absolute -left-72 top-1/2 z-0 aspect-square w-[48rem] -translate-y-1/2 rounded-full border-[2rem] border-brand-50 lg:-left-64 lg:w-[56rem] lg:border-[3rem]" />
 
-      <div className="relative z-10 mx-auto max-w-container px-6">
+      <div className="relative z-10 mx-auto max-w-container px-5">
         <div className="mx-auto max-w-narrow">
           <div className="text-center">
-            <h2 className="text-3xl font-semibold tracking-tight">
+            <h2 className="text-3xl font-bold tracking-tight">
               Pytania i odpowiedzi
             </h2>
-            <p className="mt-3 text-base text-muted-foreground">
+            <p className="mt-4 text-base text-muted-foreground">
               Najczęściej zadawane pytania o nasze usługi.
             </p>
           </div>
 
-          <div className="mt-10">
+          <div className="mt-12">
             {FAQS.map((faq, i) => (
               <FaqItem
                 key={i}

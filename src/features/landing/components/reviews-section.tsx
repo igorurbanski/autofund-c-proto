@@ -43,9 +43,9 @@ function Stars({ count }: { count: number }) {
 export function ReviewsSection() {
   return (
     <Section>
-      <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
+      <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">
+          <h2 className="text-3xl font-bold tracking-tight">
             Opinie klientów
           </h2>
           <p className="mt-2 text-base text-muted-foreground">
@@ -75,7 +75,7 @@ export function ReviewsSection() {
         </div>
       </div>
 
-      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {REVIEWS.map((review) => (
           <Card key={review.name} className="h-full">
             <CardContent className="flex h-full flex-col gap-4 pt-6">
@@ -86,7 +86,7 @@ export function ReviewsSection() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-medium">{review.name}</p>
+                  <p className="text-sm font-semibold">{review.name}</p>
                   <p className="text-xs text-muted-foreground">{review.date}</p>
                 </div>
               </div>

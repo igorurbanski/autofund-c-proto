@@ -6,7 +6,7 @@ export function PageContainer({
 }: React.ComponentProps<"main">) {
   return (
     <main
-      className={cn("mx-auto max-w-container px-6", className)}
+      className={cn("mx-auto max-w-container px-5", className)}
       {...props}
     />
   )

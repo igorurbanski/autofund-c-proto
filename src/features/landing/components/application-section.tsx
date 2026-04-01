@@ -148,7 +148,7 @@ export function ApplicationSection() {
         noValidate
         onKeyDown={handleEnterNav}
         onSubmit={(e) => e.preventDefault()}
-        className="mx-auto mt-10 max-w-3xl space-y-10"
+        className="mx-auto mt-12 max-w-3xl space-y-12"
       >
         {/* Product & borrower */}
         <div className="grid gap-5 sm:grid-cols-2">
@@ -288,7 +288,7 @@ export function ApplicationSection() {
 
         {/* Vehicle info */}
         <div className="space-y-5">
-          <h3 className="text-lg font-medium">Informacje o pojeździe</h3>
+          <h3 className="text-lg font-semibold">Informacje o pojeździe</h3>
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="app-brand">Marka</Label>

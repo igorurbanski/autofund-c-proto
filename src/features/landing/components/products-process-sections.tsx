@@ -89,13 +89,13 @@ export function ProductsProcessSections() {
           title={
             <>
               Trzy sposoby na{" "}
-              <span className="text-brand-900">finansowanie</span>
+              <span className="text-brand-800">finansowanie</span>
             </>
           }
           subtitle="Dopasuj produkt do swojej sytuacji. Każda opcja to inna forma współpracy — wybierz tę, która Ci odpowiada."
         />
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {PRODUCTS.map((product) => {
             const isSelected = selectedId === product.id
             const pColors = COLOR_CLASSES[product.color]
@@ -144,8 +144,8 @@ export function ProductsProcessSections() {
       </Section>
 
       <Section id="jak-to-dziala" className="scroll-mt-20">
-        <div className="space-y-3 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight">
+        <div className="space-y-4 text-center">
+          <h2 className="text-3xl font-bold tracking-tight">
             Jak to działa?
           </h2>
           <div className="text-lg text-muted-foreground">
@@ -154,7 +154,7 @@ export function ProductsProcessSections() {
               <button
                 onClick={() => setPickerOpen(!pickerOpen)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border border-current/20 px-4 py-0.5 font-semibold transition-colors hover:bg-muted",
+                  "inline-flex items-center gap-1.5 rounded-full border border-current/20 px-4 py-0.5 font-bold transition-colors hover:bg-muted",
                   colors.accent
                 )}
               >
@@ -188,7 +188,7 @@ export function ProductsProcessSections() {
                           className={cn("size-5 shrink-0", pColors.accent)}
                         />
                         <span
-                          className={cn("text-sm font-medium", pColors.accent)}
+                          className={cn("text-sm font-semibold", pColors.accent)}
                         >
                           {product.name}
                         </span>
@@ -203,7 +203,7 @@ export function ProductsProcessSections() {
 
         <div
           key={selected.id}
-          className="mt-12 grid grid-cols-1 gap-6 animate-in fade-in duration-300 md:grid-cols-3"
+          className="mt-14 grid grid-cols-1 gap-8 animate-in fade-in duration-300 md:grid-cols-3"
         >
           {selected.steps.map((step, i) => (
             <div
@@ -227,13 +227,13 @@ export function ProductsProcessSections() {
               <div className="flex flex-col justify-center md:pt-4">
                 <span
                   className={cn(
-                    "text-2xl font-bold md:text-3xl",
+                    "text-2xl font-extrabold md:text-3xl",
                     colors.number
                   )}
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 className="mt-1 text-base font-medium md:text-lg">{step.title}</h3>
+                <h3 className="mt-1 text-base font-semibold md:text-lg">{step.title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {step.description}
                 </p>

@@ -23,7 +23,7 @@ export function CaseStudySection() {
   return (
     <Section>
       <div className="text-center">
-        <h2 className="text-3xl font-semibold tracking-tight">
+        <h2 className="text-3xl font-bold tracking-tight">
           Przykłady finansowania
         </h2>
         <p className="mt-2 text-base text-muted-foreground">
@@ -31,7 +31,7 @@ export function CaseStudySection() {
         </p>
       </div>
 
-      <div className="mt-10 grid gap-6 sm:grid-cols-2">
+      <div className="mt-12 grid gap-8 sm:grid-cols-2">
         {CASES.map((c) => (
           <Card key={c.title}>
             <CardContent className="flex flex-col gap-3 pt-6">
@@ -39,7 +39,7 @@ export function CaseStudySection() {
                 <Badge variant="secondary">{c.product}</Badge>
                 <Badge variant="outline">{c.amount}</Badge>
               </div>
-              <h3 className="text-lg font-medium">{c.title}</h3>
+              <h3 className="text-lg font-semibold">{c.title}</h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {c.description}
               </p>

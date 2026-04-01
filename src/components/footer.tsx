@@ -12,17 +12,17 @@ const NAV_LINKS = [
 export function Footer() {
   return (
     <footer className="border-t bg-muted/30">
-      <div className="mx-auto max-w-container px-6 py-12 lg:py-16">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-container px-5 py-16 lg:py-20">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="text-lg font-semibold tracking-tight">AutoFund</p>
+            <p className="text-lg font-bold tracking-tight">AutoFund</p>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               Pożyczki pod zabezpieczenie pojazdu dla firm. Działamy na terenie całej Polski.
             </p>
           </div>
 
           <div>
-            <p className="text-sm font-medium">Nawigacja</p>
+            <p className="text-sm font-semibold">Nawigacja</p>
             <ul className="mt-3 space-y-2">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
@@ -38,12 +38,12 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="text-sm font-medium">Kontakt</p>
+            <p className="text-sm font-semibold">Kontakt</p>
             <ul className="mt-3 space-y-3">
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Phone className="mt-0.5 size-4 shrink-0" />
                 <div>
-                  <a href="tel:+48798390147" className="font-semibold transition-colors hover:text-foreground">
+                  <a href="tel:+48798390147" className="font-bold transition-colors hover:text-foreground">
                     +48 798 390 147
                   </a>
                   <p className="text-xs">Biuro Obsługi Klienta</p>
@@ -63,7 +63,7 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="text-sm font-medium">Adres</p>
+            <p className="text-sm font-semibold">Adres</p>
             <div className="mt-3 flex items-start gap-2 text-sm text-muted-foreground">
               <MapPin className="mt-0.5 size-4 shrink-0" />
               <address className="not-italic">
@@ -74,7 +74,7 @@ export function Footer() {
           </div>
         </div>
 
-        <Separator className="my-8" />
+        <Separator className="my-10" />
 
         <p className="text-center text-xs text-muted-foreground">
           &copy; {new Date().getFullYear()} AutoFund. Wszelkie prawa zastrzeżone.

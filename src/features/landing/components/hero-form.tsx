@@ -149,7 +149,7 @@ export function HeroForm() {
 
   return (
     <>
-    <Card className="shadow-lg">
+    <Card className="shadow-sm">
       <CardHeader>
         <CardTitle className="text-xl">Sprawdź koszty swojej pożyczki</CardTitle>
         <CardDescription>
@@ -180,7 +180,7 @@ export function HeroForm() {
               >
                 <RadioGroupItem value={product.id} className={cn("absolute top-3 right-3", colors.radio)} />
                 <div className="grid gap-0.5">
-                  <span className={cn("text-sm font-medium leading-tight", colors.title)}>{label.title}</span>
+                  <span className={cn("text-sm font-semibold leading-tight", colors.title)}>{label.title}</span>
                   <span className="text-sm leading-snug text-muted-foreground">{label.desc}</span>
                 </div>
               </label>
