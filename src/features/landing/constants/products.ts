@@ -19,14 +19,11 @@ export type Product = {
   steps: ProductStep[]
 }
 
-const IMG_CAR = "/illustration-example.png"
-const IMG_DOC = "/illustration-example-2.png"
-
 export const PRODUCTS: Product[] = [
   {
     id: "auto-drive",
     name: "AutoDrive",
-    tagline: "Jedź dalej — my finansujemy",
+    tagline: "Pożyczka pod zabezpieczenie",
     description:
       "Zabezpiecz pożyczkę swoim pojazdem i korzystaj z niego bez ograniczeń. Idealne, gdy potrzebujesz gotówki, ale nie chcesz rezygnować z auta.",
     icon: Car,
@@ -35,36 +32,36 @@ export const PRODUCTS: Product[] = [
       {
         title: "Skontaktuj się z nami",
         description: "Zadzwoń lub wypełnij formularz — doradzimy najlepsze rozwiązanie",
-        image: IMG_CAR,
+        image: "/auto-drive-step-1-contact.jpg",
       },
       {
         title: "Wypełnij wniosek",
         description: "Szybki wniosek online — to proste i zajmuje chwilę",
-        image: IMG_DOC,
+        image: "/auto-drive-step-2-form.jpg",
       },
       {
         title: "Wyślij dokumenty",
         description: "Prześlij nam wymagane dokumenty — pomagamy na każdym kroku",
-        image: IMG_DOC,
+        image: "/auto-drive-step-3-documents.jpg",
       },
       {
         title: "Wycena pojazdu",
         description:
           "Wycenimy Twój pojazd na podstawie dokumentów i wideorozmowy z rzeczoznawcą lub dokumentów złożonych przez Ciebie",
-        image: IMG_CAR,
+        image: "/auto-drive-step-4-valuation.jpg",
       },
       {
         title: "Notariusz i rejestracja",
         description:
           "Podpisanie dokumentów u notariusza i wizyta w urzędzie komunikacji",
-        image: IMG_DOC,
+        image: "/auto-drive-step-5-notary.jpg",
       },
     ],
   },
   {
     id: "auto-start",
     name: "AutoStart",
-    tagline: "Sfinansuj swój następny pojazd",
+    tagline: "Pożyczka na zakup",
     description:
       "Znajdź auto dla firmy, a my zapewnimy finansowanie zakupu. Ty wybierasz pojazd — my załatwiamy resztę.",
     icon: KeyRound,
@@ -72,35 +69,30 @@ export const PRODUCTS: Product[] = [
     steps: [
       {
         title: "Wybór pojazdu",
-        description: "Znajdź auto, które chcesz kupić — nowe lub używane",
-        image: IMG_CAR,
+        description: "Znajdź auto, które chcesz kupić — musisz już mieć wybrany model oraz dealera samochodowego lub osobę sprzedającą",
+        image: "/auto-start-step-1-vehicle-select.jpg",
       },
       {
         title: "Wniosek i wycena",
         description: "Składasz wniosek, a my wyceniamy wybrany pojazd",
-        image: IMG_DOC,
+        image: "/auto-start-step-2-form.jpg",
       },
       {
         title: "Dokumenty i notariusz",
         description: "Przygotowujemy dokumenty, podpisujemy umowę u notariusza",
-        image: IMG_DOC,
+        image: "/auto-start-step-3-documents.jpg",
       },
       {
         title: "Rejestracja",
         description: "Rejestrujemy pojazd na Ciebie z zabezpieczeniem na czas spłaty",
-        image: IMG_DOC,
-      },
-      {
-        title: "Finalizacja",
-        description: "Otrzymujesz kluczyki i środki — auto jest Twoje",
-        image: IMG_CAR,
+        image: "/auto-start-step-4-registration.jpg",
       },
     ],
   },
   {
     id: "auto-park",
     name: "AutoPark",
-    tagline: "Szybka gotówka na krótki okres",
+    tagline: "Zostaw swój samochód u nas",
     description:
       "Zostaw pojazd na naszym strzeżonym placu, a odbierz go po spłacie. Minimum formalności, maksimum szybkości.",
     icon: Timer,
@@ -108,64 +100,66 @@ export const PRODUCTS: Product[] = [
     steps: [
       {
         title: "Kontakt",
-        description: "Zadzwoń lub napisz — odpowiadamy od razu",
-        image: IMG_CAR,
+        description: "Zadzwoń lub wypełnij wniosek.",
+        image: "/auto-park-step-1-contact.jpg",
       },
       {
-        title: "Wycena pojazdu",
+        title: "Dojazd",
+        description: "Dojazd na wyznaczony przez nas parking",
+        image: "/auto-park-step-2-navigation.jpg",
+      },
+      {
+        title: "Wycena",
         description: "Przyjeżdżasz do nas, wyceniamy auto na miejscu",
-        image: IMG_CAR,
+        image: "/auto-park-step-3-valuation.jpg",
       },
       {
-        title: "Wniosek",
-        description: "Szybki wniosek — minimum formalności",
-        image: IMG_DOC,
-      },
-      {
-        title: "Przekazanie auta",
+        title: "Podpisanie umowy, przekazanie auta",
         description: "Zostawiasz pojazd na naszym strzeżonym placu",
-        image: IMG_CAR,
+        image: "/auto-park-step-4-handover.jpg",
       },
       {
         title: "Wypłata",
-        description: "Gotówka nawet tego samego dnia",
-        image: IMG_DOC,
+        description: "Gotówka nawet tego samego dnia przelewem na konto wyznaczone przez Ciebie",
+        image: "/auto-park-step-5-payout.jpg",
       },
     ],
   },
   {
     id: "smart-plan",
     name: "SmartPlan",
-    tagline: "Twoje auto, Twoje zasady",
+    tagline: "Sprzedaj auto — jeździj nim dalej",
     description:
       "Odkupujemy Twój pojazd i dajemy Ci opcję odkupu do 36 miesięcy. Płacisz opłatę rezerwacyjną, a jeździsz jak dotychczas.",
     icon: ArrowLeftRight,
     color: "olive",
     steps: [
       {
-        title: "Wycena",
-        description: "Wyceniamy Twoje auto i ustalamy warunki odkupu",
-        image: IMG_CAR,
+        title: "Skontaktuj się z nami",
+        description: "Zadzwoń lub wypełnij formularz — doradzimy najlepsze rozwiązanie",
+        image: "/smart-plan-step-1-contact.jpg",
       },
       {
-        title: "Odkup pojazdu",
-        description: "Kupujemy Twój samochód — otrzymujesz środki od razu",
-        image: IMG_CAR,
+        title: "Wypełnij wniosek",
+        description: "Szybki wniosek online — to proste i zajmuje chwilę",
+        image: "/smart-plan-step-2-form.jpg",
       },
       {
-        title: "Umowa opcji",
-        description: "Podpisujesz umowę opcji odkupu na okres do 36 miesięcy",
-        image: IMG_DOC,
+        title: "Wyślij dokumenty",
+        description: "Prześlij nam wymagane dokumenty — pomagamy na każdym kroku",
+        image: "/smart-plan-step-3-documents.jpg",
       },
       {
-        title: "Użytkowanie",
-        description: "Jeździsz dalej jak dotychczas, płacąc opłatę rezerwacyjną",
-        image: IMG_CAR,
+        title: "Wycena pojazdu",
+        description:
+          "Wycenimy Twój pojazd na podstawie dokumentów i wideorozmowy z rzeczoznawcą lub dokumentów złożonych przez Ciebie",
+        image: "/smart-plan-step-4-valuation.jpg",
       },
       {
-        title: "Twoja decyzja",
-        description: "Odkup auto po stałej cenie lub rozwiąż umowę bez zobowiązań",
-        image: IMG_DOC,
+        title: "Notariusz i rejestracja",
+        description:
+          "Podpisanie dokumentów u notariusza i wizyta w urzędzie komunikacji",
+        image: "/smart-plan-step-5-notary.jpg",
       },
     ],
   },

@@ -29,17 +29,17 @@ const MAX_LTV: Record<string, number> = {
 const DEFAULT_LTV = 0.8
 
 const TILE_LABELS: Record<string, { title: string; desc: string }> = {
-  "auto-drive": { title: "Pożyczka pod pojazd", desc: "Jeździsz dalej — auto jest zabezpieczeniem" },
-  "auto-start": { title: "Zakup pojazdu", desc: "Finansujemy auto, które wybierzesz" },
+  "auto-drive": { title: "Pożyczka pod pojazd", desc: "Jedziesz dalej — auto jest zabezpieczeniem" },
+  "auto-start": { title: "Zakup pojazdu", desc: "Ty wybierasz pojazd — my załatwiamy resztę" },
   "auto-park": { title: "Szybka gotówka", desc: "Zostawiasz auto, odbierasz po spłacie" },
-  "smart-plan": { title: "Odkup z opcją zwrotu", desc: "Sprzedajesz auto i możesz je odkupić" },
+  "smart-plan": { title: "Odkup z opcją zwrotu", desc: "Sprzedajesz auto i jeździsz dalej" },
 }
 
 const TILE_COLORS: Record<ProductColor, { border: string; radio: string; title: string }> = {
-  violet: { border: "border-brand-500", radio: "data-checked:bg-brand-500 data-checked:border-brand-500", title: "text-brand-500" },
-  lime: { border: "border-brand2-700", radio: "data-checked:bg-brand2-700 data-checked:border-brand2-700", title: "text-brand2-700" },
-  plum: { border: "border-brand-800", radio: "data-checked:bg-brand-800 data-checked:border-brand-800", title: "text-brand-800" },
-  olive: { border: "border-brand2-900", radio: "data-checked:bg-brand2-900 data-checked:border-brand2-900", title: "text-brand2-900" },
+  violet: { border: "border-orange-400", radio: "data-checked:bg-orange-400 data-checked:border-orange-400", title: "text-orange-400" },
+  lime:   { border: "border-lime-400",   radio: "data-checked:bg-lime-400 data-checked:border-lime-400",     title: "text-lime-400"   },
+  plum:   { border: "border-brand-800",  radio: "data-checked:bg-brand-800 data-checked:border-brand-800",   title: "text-brand-800"  },
+  olive:  { border: "border-brand-300",  radio: "data-checked:bg-brand-300 data-checked:border-brand-300",   title: "text-brand-300"  },
 }
 
 function parseNumeric(val: string) {
@@ -64,6 +64,8 @@ export function HeroForm() {
     setRepaymentPeriod,
   } = useLanding()
   const [loanError, setLoanError] = useState("")
+  const [amountError, setAmountError] = useState("")
+  const [periodError, setPeriodError] = useState("")
   const [scheduleOpen, setScheduleOpen] = useState(false)
   const [scheduleData, setScheduleData] = useState<ScheduleResult | null>(null)
 
@@ -129,7 +131,28 @@ export function HeroForm() {
   }
 
   const handleSubmit = () => {
+    let firstErrorId: string | null = null
+
+    const newAmountError = !parseNumeric(loanAmount) ? "Podaj kwotę pożyczki." : ""
+    const newPeriodError = !repaymentPeriod ? "Wybierz okres spłaty." : ""
+
+    setAmountError(newAmountError)
+    setPeriodError(newPeriodError)
+
+    if (newAmountError) firstErrorId = "loan-amount"
+    else if (newPeriodError) firstErrorId = "repayment-period"
+
     validateLoan(loanAmount, vehicleValue)
+    const ltvViolation = !newAmountError && vehicleValue &&
+      parseNumeric(loanAmount) > parseNumeric(vehicleValue) * getMaxLtv(selectedProductId)
+    if (!firstErrorId && ltvViolation) firstErrorId = "loan-amount"
+
+    if (firstErrorId) {
+      const el = document.getElementById(firstErrorId)
+      if (el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); el.focus() }
+      return
+    }
+
     if (!canOpenSchedule()) return
 
     const months = Number(repaymentPeriod)
@@ -172,7 +195,7 @@ export function HeroForm() {
               <label
                 key={product.id}
                 className={cn(
-                  "relative cursor-pointer rounded-xl border p-3 pr-8 transition-colors",
+                  "relative cursor-pointer rounded-xl border p-4 pr-9 transition-colors",
                   isSelected
                     ? cn(colors.border, "bg-muted/60")
                     : "border-input bg-muted/30 hover:bg-muted/50"
@@ -180,8 +203,11 @@ export function HeroForm() {
               >
                 <RadioGroupItem value={product.id} className={cn("absolute top-3 right-3", colors.radio)} />
                 <div className="grid gap-0.5">
-                  <span className={cn("text-sm font-semibold leading-tight", colors.title)}>{label.title}</span>
-                  <span className="text-sm leading-snug text-muted-foreground">{label.desc}</span>
+                  <span className={cn("flex items-center gap-1.5 text-base font-medium leading-tight", colors.title)}>
+                    <product.icon className="size-4 shrink-0" />
+                    {product.name}
+                  </span>
+                  <span className="text-base leading-snug text-muted-foreground">{label.desc}</span>
                 </div>
               </label>
             )
@@ -234,17 +260,18 @@ export function HeroForm() {
                 value={loanAmount}
                 onChange={(e) => {
                   setLoanAmount(e.target.value)
+                  if (amountError) setAmountError("")
                   if (loanError) validateLoan(e.target.value, vehicleValue)
                 }}
                 onBlur={(e) => validateLoan(e.target.value, vehicleValue)}
-                aria-invalid={!!loanError}
+                aria-invalid={!!(loanError || amountError)}
               />
               <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-base text-muted-foreground">
                 PLN
               </span>
             </div>
-            {loanError && (
-              <p className="text-sm text-destructive">{loanError}</p>
+            {(amountError || loanError) && (
+              <p className="text-sm text-destructive">{amountError || loanError}</p>
             )}
           </div>
 
@@ -254,8 +281,12 @@ export function HeroForm() {
               <select
                 id="repayment-period"
                 value={repaymentPeriod}
-                onChange={(e) => setRepaymentPeriod(e.target.value)}
-                className="h-12 w-full appearance-none rounded-4xl border border-input bg-input/30 pl-5 pr-12 py-2.5 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
+                onChange={(e) => { setRepaymentPeriod(e.target.value); if (periodError) setPeriodError("") }}
+                className={cn(
+                  "h-12 w-full appearance-none rounded-4xl border border-input bg-input/30 pl-5 pr-12 py-2.5 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  periodError && "border-destructive ring-[3px] ring-destructive/20"
+                )}
+                aria-invalid={!!periodError}
               >
                 <option value="">Wybierz okres</option>
                 {termOptions.map((m) => (
@@ -266,6 +297,9 @@ export function HeroForm() {
               </select>
               <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             </div>
+            {periodError && (
+              <p className="text-sm text-destructive">{periodError}</p>
+            )}
           </div>
 
           <div className="grid gap-2.5">
@@ -277,7 +311,7 @@ export function HeroForm() {
         </form>
       </CardContent>
     </Card>
-    <ScheduleDialog open={scheduleOpen} onOpenChange={setScheduleOpen} data={scheduleData} />
+    <ScheduleDialog open={scheduleOpen} onOpenChange={setScheduleOpen} data={scheduleData} productColor={PRODUCTS.find((p) => p.id === selectedProductId)?.color} />
     </>
   )
 }

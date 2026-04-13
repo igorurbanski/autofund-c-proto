@@ -15,10 +15,10 @@ import { TERM_OPTIONS, ALL_TERM_OPTIONS } from "../constants/loan-params"
 import { useLanding } from "../context/landing-context"
 
 const COLOR_MAP: Record<ProductColor, { dot: string }> = {
-  violet: { dot: "bg-brand-500" },
-  lime: { dot: "bg-brand2-700" },
+  violet: { dot: "bg-orange-400" },
+  lime: { dot: "bg-lime-400" },
   plum: { dot: "bg-brand-800" },
-  olive: { dot: "bg-brand2-900" },
+  olive: { dot: "bg-brand-300" },
 }
 
 const BORROWER_BASE = [
@@ -48,21 +48,49 @@ const CURRENT_YEAR = new Date().getFullYear()
 const MIN_YEAR = CURRENT_YEAR - 15
 
 const selectClass =
-  "h-12 w-full appearance-none rounded-4xl border border-input bg-input/30 pl-5 pr-12 py-2.5 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 md:text-sm"
+  "h-12 w-full appearance-none rounded-4xl border border-input bg-input/30 pl-5 pr-12 py-2.5 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50"
+
+const selectErrorClass =
+  "border-destructive ring-[3px] ring-destructive/20"
+
+type Errors = Record<string, string>
+
+function clearError(id: string, setErrors: React.Dispatch<React.SetStateAction<Errors>>) {
+  setErrors((prev) => {
+    if (!prev[id]) return prev
+    const next = { ...prev }
+    delete next[id]
+    return next
+  })
+}
 
 export function ApplicationSection() {
   const {
     selectedProductId,
     setSelectedProductId,
+    vehicleValue,
+    setVehicleValue,
     loanAmount,
     setLoanAmount,
     repaymentPeriod,
     setRepaymentPeriod,
   } = useLanding()
+
   const [appProductId, setAppProductId] = useState("")
   const [borrower, setBorrower] = useState("firma-start")
-  const [yearError, setYearError] = useState("")
-  const [emailError, setEmailError] = useState("")
+  const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [email, setEmail] = useState("")
+  const [brand, setBrand] = useState("")
+  const [model, setModel] = useState("")
+  const [year, setYear] = useState("")
+  const [mileage, setMileage] = useState("")
+  const [body, setBody] = useState("")
+  const [fuel, setFuel] = useState("")
+  const [damaged, setDamaged] = useState("")
+  const [purpose, setPurpose] = useState("")
+  const [rodo, setRodo] = useState(false)
+  const [errors, setErrors] = useState<Errors>({})
 
   const isFirstRender = useRef(true)
   useEffect(() => {
@@ -87,36 +115,7 @@ export function ApplicationSection() {
     if (repaymentPeriod && !newTerms.includes(Number(repaymentPeriod))) {
       setRepaymentPeriod("")
     }
-  }
-
-  const handleYearBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const val = e.target.value
-    if (!val) {
-      setYearError("")
-      return
-    }
-    const year = Number(val)
-    if (year < MIN_YEAR) {
-      setYearError(
-        `Finansujemy pojazdy nie starsze niż ${MIN_YEAR} rok produkcji.`
-      )
-    } else if (year > CURRENT_YEAR) {
-      setYearError("Rok produkcji nie może być z przyszłości.")
-    } else {
-      setYearError("")
-    }
-  }
-
-  const validateEmail = (val: string) => {
-    if (!val) {
-      setEmailError("")
-      return
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
-      setEmailError("Podaj poprawny adres e-mail.")
-    } else {
-      setEmailError("")
-    }
+    clearError("app-product", setErrors)
   }
 
   const handleEnterNav = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -137,18 +136,80 @@ export function ApplicationSection() {
     }
   }
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const newErrors: Errors = {}
+
+    if (!appProductId) newErrors["app-product"] = "Wybierz produkt."
+    if (!name.trim()) newErrors["app-name"] = "Podaj imię i nazwisko."
+    if (!phone.trim()) newErrors["app-phone"] = "Podaj numer telefonu."
+    if (!email.trim()) {
+      newErrors["app-email"] = "Podaj adres e-mail."
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors["app-email"] = "Podaj poprawny adres e-mail."
+    }
+    if (!loanAmount.trim()) newErrors["app-amount"] = "Podaj kwotę pożyczki."
+    if (!repaymentPeriod) newErrors["app-term"] = "Wybierz okres spłaty."
+    if (!brand.trim()) newErrors["app-brand"] = "Podaj markę pojazdu."
+    if (!model.trim()) newErrors["app-model"] = "Podaj model pojazdu."
+    if (!year.trim()) {
+      newErrors["app-year"] = "Podaj rok produkcji."
+    } else {
+      const y = Number(year)
+      if (y < MIN_YEAR)
+        newErrors["app-year"] = `Finansujemy pojazdy nie starsze niż ${MIN_YEAR} rok produkcji.`
+      else if (y > CURRENT_YEAR)
+        newErrors["app-year"] = "Rok produkcji nie może być z przyszłości."
+    }
+    if (!mileage.trim()) newErrors["app-mileage"] = "Podaj przebieg pojazdu."
+    if (!body) newErrors["app-body"] = "Wybierz rodzaj nadwozia."
+    if (!fuel) newErrors["app-fuel"] = "Wybierz rodzaj paliwa."
+    if (!vehicleValue.trim()) newErrors["app-value"] = "Podaj wartość pojazdu."
+    if (!damaged) newErrors["app-damaged"] = "Wybierz odpowiedź."
+    if (!rodo) newErrors["rodo"] = "Wymagana zgoda na przetwarzanie danych."
+
+    setErrors(newErrors)
+
+    const firstId = Object.keys(newErrors)[0]
+    if (firstId) {
+      const el = document.getElementById(firstId)
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" })
+        el.focus()
+      }
+    }
+  }
+
   return (
-    <Section id="wniosek">
+    <Section id="wniosek" narrow>
       <SectionHeading
-        title="Złóż wniosek"
+        title={
+          <>
+            Złóż{" "}
+            <span className="relative inline-block">
+              wniosek
+              <svg
+                aria-hidden="true"
+                className="absolute -bottom-1.5 left-0 h-3 w-full"
+                viewBox="0 0 200 14"
+                fill="currentColor"
+                preserveAspectRatio="none"
+              >
+                <path d="M0 12C60 0 150 2 200 6L200 9C150 7 60 5 0 14Z" />
+              </svg>
+            </span>
+          </>
+        }
         subtitle="Wypełnij formularz, a my skontaktujemy się z Tobą w ciągu 24 godzin."
+        className="[&_h2]:text-brand-800"
       />
 
       <form
         noValidate
         onKeyDown={handleEnterNav}
-        onSubmit={(e) => e.preventDefault()}
-        className="mx-auto mt-12 max-w-3xl space-y-12"
+        onSubmit={handleSubmit}
+        className="mt-12 space-y-12"
       >
         {/* Product & borrower */}
         <div className="grid gap-5 sm:grid-cols-2">
@@ -168,7 +229,8 @@ export function ApplicationSection() {
                 id="app-product"
                 value={appProductId}
                 onChange={(e) => handleProductChange(e.target.value)}
-                className={cn(selectClass, "pr-16")}
+                className={cn(selectClass, "pr-16", errors["app-product"] && selectErrorClass)}
+                aria-invalid={!!errors["app-product"]}
               >
                 <option value="" disabled>
                   Wybierz...
@@ -191,6 +253,9 @@ export function ApplicationSection() {
                 <ChevronDown className="size-4 text-muted-foreground" />
               </div>
             </div>
+            {errors["app-product"] && (
+              <p className="text-sm text-destructive">{errors["app-product"]}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -217,11 +282,31 @@ export function ApplicationSection() {
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="app-name">Imię i nazwisko</Label>
-            <Input id="app-name" placeholder="Jan Kowalski" />
+            <Input
+              id="app-name"
+              placeholder="Jan Kowalski"
+              value={name}
+              onChange={(e) => { setName(e.target.value); clearError("app-name", setErrors) }}
+              aria-invalid={!!errors["app-name"]}
+            />
+            {errors["app-name"] && (
+              <p className="text-sm text-destructive">{errors["app-name"]}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="app-phone">Telefon</Label>
-            <Input id="app-phone" type="text" inputMode="tel" placeholder="+48 000 000 000" />
+            <Input
+              id="app-phone"
+              type="text"
+              inputMode="tel"
+              placeholder="+48 000 000 000"
+              value={phone}
+              onChange={(e) => { setPhone(e.target.value); clearError("app-phone", setErrors) }}
+              aria-invalid={!!errors["app-phone"]}
+            />
+            {errors["app-phone"] && (
+              <p className="text-sm text-destructive">{errors["app-phone"]}</p>
+            )}
           </div>
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="app-email">Adres e-mail</Label>
@@ -230,12 +315,12 @@ export function ApplicationSection() {
               type="text"
               inputMode="email"
               placeholder="jan@firma.pl"
-              onBlur={(e) => validateEmail(e.target.value)}
-              onChange={(e) => emailError && validateEmail(e.target.value)}
-              aria-invalid={!!emailError}
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); clearError("app-email", setErrors) }}
+              aria-invalid={!!errors["app-email"]}
             />
-            {emailError && (
-              <p className="text-sm text-destructive">{emailError}</p>
+            {errors["app-email"] && (
+              <p className="text-sm text-destructive">{errors["app-email"]}</p>
             )}
           </div>
         </div>
@@ -250,8 +335,12 @@ export function ApplicationSection() {
               inputMode="numeric"
               placeholder="50 000"
               value={loanAmount}
-              onChange={(e) => setLoanAmount(e.target.value)}
+              onChange={(e) => { setLoanAmount(e.target.value); clearError("app-amount", setErrors) }}
+              aria-invalid={!!errors["app-amount"]}
             />
+            {errors["app-amount"] && (
+              <p className="text-sm text-destructive">{errors["app-amount"]}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="app-term">Okres spłaty</Label>
@@ -259,8 +348,9 @@ export function ApplicationSection() {
               <select
                 id="app-term"
                 value={repaymentPeriod}
-                onChange={(e) => setRepaymentPeriod(e.target.value)}
-                className={selectClass}
+                onChange={(e) => { setRepaymentPeriod(e.target.value); clearError("app-term", setErrors) }}
+                className={cn(selectClass, errors["app-term"] && selectErrorClass)}
+                aria-invalid={!!errors["app-term"]}
               >
                 <option value="" disabled>
                   Wybierz...
@@ -273,6 +363,9 @@ export function ApplicationSection() {
               </select>
               <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             </div>
+            {errors["app-term"] && (
+              <p className="text-sm text-destructive">{errors["app-term"]}</p>
+            )}
           </div>
         </div>
 
@@ -281,8 +374,10 @@ export function ApplicationSection() {
           <Label htmlFor="app-purpose">Cel pożyczki</Label>
           <Textarea
             id="app-purpose"
-            placeholder="Opisz krótko, na co potrzebujesz finansowania..."
+            placeholder="Opisz krótko, na co potrzebujesz finansowania. Pamiętaj, aby celem pożyczki była inwestycja."
             className="min-h-24"
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
           />
         </div>
 
@@ -292,11 +387,29 @@ export function ApplicationSection() {
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="app-brand">Marka</Label>
-              <Input id="app-brand" placeholder="np. BMW" />
+              <Input
+                id="app-brand"
+                placeholder="np. BMW"
+                value={brand}
+                onChange={(e) => { setBrand(e.target.value); clearError("app-brand", setErrors) }}
+                aria-invalid={!!errors["app-brand"]}
+              />
+              {errors["app-brand"] && (
+                <p className="text-sm text-destructive">{errors["app-brand"]}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="app-model">Model</Label>
-              <Input id="app-model" placeholder="np. Seria 3" />
+              <Input
+                id="app-model"
+                placeholder="np. Seria 3"
+                value={model}
+                onChange={(e) => { setModel(e.target.value); clearError("app-model", setErrors) }}
+                aria-invalid={!!errors["app-model"]}
+              />
+              {errors["app-model"] && (
+                <p className="text-sm text-destructive">{errors["app-model"]}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="app-year">Rok produkcji</Label>
@@ -305,22 +418,39 @@ export function ApplicationSection() {
                 type="text"
                 inputMode="numeric"
                 placeholder={String(CURRENT_YEAR)}
-                onBlur={handleYearBlur}
-                onChange={() => yearError && setYearError("")}
-                aria-invalid={!!yearError}
+                value={year}
+                onChange={(e) => { setYear(e.target.value); clearError("app-year", setErrors) }}
+                aria-invalid={!!errors["app-year"]}
               />
-              {yearError && (
-                <p className="text-sm text-destructive">{yearError}</p>
+              {errors["app-year"] && (
+                <p className="text-sm text-destructive">{errors["app-year"]}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="app-mileage">Przebieg (km)</Label>
-              <Input id="app-mileage" type="text" inputMode="numeric" placeholder="80 000" />
+              <Input
+                id="app-mileage"
+                type="text"
+                inputMode="numeric"
+                placeholder="80 000"
+                value={mileage}
+                onChange={(e) => { setMileage(e.target.value); clearError("app-mileage", setErrors) }}
+                aria-invalid={!!errors["app-mileage"]}
+              />
+              {errors["app-mileage"] && (
+                <p className="text-sm text-destructive">{errors["app-mileage"]}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="app-body">Rodzaj nadwozia</Label>
               <div className="relative">
-                <select id="app-body" className={selectClass} defaultValue="">
+                <select
+                  id="app-body"
+                  value={body}
+                  onChange={(e) => { setBody(e.target.value); clearError("app-body", setErrors) }}
+                  className={cn(selectClass, errors["app-body"] && selectErrorClass)}
+                  aria-invalid={!!errors["app-body"]}
+                >
                   <option value="" disabled>
                     Wybierz...
                   </option>
@@ -332,11 +462,20 @@ export function ApplicationSection() {
                 </select>
                 <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               </div>
+              {errors["app-body"] && (
+                <p className="text-sm text-destructive">{errors["app-body"]}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="app-fuel">Rodzaj paliwa</Label>
               <div className="relative">
-                <select id="app-fuel" className={selectClass} defaultValue="">
+                <select
+                  id="app-fuel"
+                  value={fuel}
+                  onChange={(e) => { setFuel(e.target.value); clearError("app-fuel", setErrors) }}
+                  className={cn(selectClass, errors["app-fuel"] && selectErrorClass)}
+                  aria-invalid={!!errors["app-fuel"]}
+                >
                   <option value="" disabled>
                     Wybierz...
                   </option>
@@ -348,11 +487,35 @@ export function ApplicationSection() {
                 </select>
                 <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               </div>
+              {errors["app-fuel"] && (
+                <p className="text-sm text-destructive">{errors["app-fuel"]}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="app-value">Wartość pojazdu (PLN)</Label>
+              <Input
+                id="app-value"
+                type="text"
+                inputMode="numeric"
+                placeholder="60 000"
+                value={vehicleValue}
+                onChange={(e) => { setVehicleValue(e.target.value); clearError("app-value", setErrors) }}
+                aria-invalid={!!errors["app-value"]}
+              />
+              {errors["app-value"] && (
+                <p className="text-sm text-destructive">{errors["app-value"]}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="app-damaged">Czy pojazd jest uszkodzony?</Label>
               <div className="relative">
-                <select id="app-damaged" className={selectClass} defaultValue="">
+                <select
+                  id="app-damaged"
+                  value={damaged}
+                  onChange={(e) => { setDamaged(e.target.value); clearError("app-damaged", setErrors) }}
+                  className={cn(selectClass, errors["app-damaged"] && selectErrorClass)}
+                  aria-invalid={!!errors["app-damaged"]}
+                >
                   <option value="" disabled>
                     Wybierz...
                   </option>
@@ -361,28 +524,39 @@ export function ApplicationSection() {
                 </select>
                 <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               </div>
+              {errors["app-damaged"] && (
+                <p className="text-sm text-destructive">{errors["app-damaged"]}</p>
+              )}
             </div>
           </div>
         </div>
 
         {/* RODO consent */}
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-1 size-4 shrink-0 accent-primary"
-          />
-          <span className="text-sm text-muted-foreground">
-            Wyrażam zgodę na przetwarzanie moich danych osobowych przez AutoFund
-            w celu rozpatrzenia wniosku o pożyczkę, zgodnie z{" "}
-            <Link
-              href="/polityka-prywatnosci"
-              className="underline underline-offset-2 transition-colors hover:text-foreground"
-            >
-              Polityką Prywatności
-            </Link>
-            .
-          </span>
-        </label>
+        <div className="space-y-1.5">
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              id="rodo"
+              type="checkbox"
+              className="mt-1 size-4 shrink-0 accent-primary"
+              checked={rodo}
+              onChange={(e) => { setRodo(e.target.checked); clearError("rodo", setErrors) }}
+            />
+            <span className="text-sm text-muted-foreground">
+              Wyrażam zgodę na przetwarzanie moich danych osobowych przez AutoFund
+              w celu rozpatrzenia wniosku o pożyczkę, zgodnie z{" "}
+              <Link
+                href="/polityka-prywatnosci"
+                className="underline underline-offset-2 transition-colors hover:text-foreground"
+              >
+                Polityką Prywatności
+              </Link>
+              .
+            </span>
+          </label>
+          {errors["rodo"] && (
+            <p className="text-sm text-destructive">{errors["rodo"]}</p>
+          )}
+        </div>
 
         {/* Submit */}
         <Button type="submit" size="lg" className="w-full sm:w-auto">

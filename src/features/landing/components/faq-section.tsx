@@ -2,16 +2,18 @@
 
 import { useState } from "react"
 import { ChevronDown } from "lucide-react"
+import { Section } from "@/components/section"
+import { SectionHeading } from "@/components/section-heading"
 import { cn } from "@/lib/utils"
 
 const FAQS = [
   {
     q: "Ile mogę pożyczyć?",
-    a: "Możesz otrzymać pożyczkę do 90% wartości pojazdu. Pożyczamy kwoty od 10 000 do 150 000 zł.",
+    a: "Możesz otrzymać pożyczkę do 80% wartości pojazdu. Pożyczamy kwoty od 10 000 do 250 000 zł.",
   },
   {
     q: "Jaki jest okres spłaty pożyczki?",
-    a: "Udzielamy pożyczek na okres do 60 miesięcy. Harmonogram spłat ustalamy indywidualnie, dopasowując go do Twojej sytuacji.",
+    a: "Udzielamy pożyczek na okres do 48 miesięcy. Harmonogram spłat ustalamy indywidualnie, dopasowując go do produktu.",
   },
   {
     q: "Czy mogę spłacić pożyczkę wcześniej?",
@@ -23,7 +25,7 @@ const FAQS = [
   },
   {
     q: "Kto może otrzymać pożyczkę?",
-    a: "Jednoosobowe działalności gospodarcze, spółki cywilne, spółki z o.o. i inne — nawet od pierwszego dnia założenia firmy.",
+    a: "Jednoosobowe działalności gospodarcze, spółki cywilne, spółki z o.o. i firmy od pierwszego dnia założenia.",
   },
   {
     q: "Na co mogę przeznaczyć środki?",
@@ -31,15 +33,15 @@ const FAQS = [
   },
   {
     q: "Jakie warunki musi spełniać pojazd?",
-    a: "Samochód osobowy lub dostawczy (do 3,5 T), nie starszy niż 15 lat. Auto musi posiadać kartę pojazdu i polisę OC. Na pojeździe nie mogą być ustanowione inne zabezpieczenia.",
+    a: "Samochód osobowy lub dostawczy (do 3,5 T), nie starszy niż 14 lat. Auto musi posiadać kartę pojazdu i polisę OC. Na pojeździe nie mogą być ustanowione inne zabezpieczenia.",
   },
   {
     q: "Czy muszę przerejestrować pojazd?",
-    a: "Nie. Pozostajesz właścicielem pojazdu. Dokonujemy jedynie adnotacji w dowodzie rejestracyjnym i karcie pojazdu — wszystko podczas jednej wizyty w wydziale komunikacji.",
+    a: "W zależności od produktu pożyczkowego, przerejestrowanie może być wymagane.",
   },
   {
     q: "Czy wymagane jest zaświadczenie o dochodach?",
-    a: "Nie, nie wymagamy zaświadczeń o dochodach.",
+    a: "Opcjonalnie.",
   },
   {
     q: "Czy są jakieś ukryte koszty?",
@@ -95,33 +97,27 @@ export function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section className="relative overflow-hidden py-section">
+    <Section narrow className="relative overflow-hidden">
       <div className="pointer-events-none absolute -left-72 top-1/2 z-0 aspect-square w-[48rem] -translate-y-1/2 rounded-full border-[2rem] border-brand-50 lg:-left-64 lg:w-[56rem] lg:border-[3rem]" />
 
-      <div className="relative z-10 mx-auto max-w-container px-5">
-        <div className="mx-auto max-w-narrow">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight">
-              Pytania i odpowiedzi
-            </h2>
-            <p className="mt-4 text-base text-muted-foreground">
-              Najczęściej zadawane pytania o nasze usługi.
-            </p>
-          </div>
+      <div className="relative z-10">
+        <SectionHeading
+          title="Pytania i odpowiedzi"
+          subtitle="Najczęściej zadawane pytania o nasze usługi."
+        />
 
-          <div className="mt-12">
-            {FAQS.map((faq, i) => (
-              <FaqItem
-                key={i}
-                q={faq.q}
-                a={faq.a}
-                open={openIndex === i}
-                onToggle={() => setOpenIndex(openIndex === i ? null : i)}
-              />
-            ))}
-          </div>
+        <div className="mt-12">
+          {FAQS.map((faq, i) => (
+            <FaqItem
+              key={i}
+              q={faq.q}
+              a={faq.a}
+              open={openIndex === i}
+              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+            />
+          ))}
         </div>
       </div>
-    </section>
+    </Section>
   )
 }

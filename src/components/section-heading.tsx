@@ -19,9 +19,9 @@ export function SectionHeading({
         className
       )}
     >
-      <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
+      <h2 className="text-3xl font-semibold tracking-tight">{title}</h2>
       {subtitle && (
-        <p className="text-lg text-muted-foreground">{subtitle}</p>
+        <div className="text-lg font-medium text-muted-foreground">{subtitle}</div>
       )}
     </div>
   )

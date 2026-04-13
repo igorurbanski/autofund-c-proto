@@ -1,4 +1,5 @@
 import { Section } from "@/components/section"
+import { SectionHeading } from "@/components/section-heading"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
@@ -22,14 +23,10 @@ const CASES = [
 export function CaseStudySection() {
   return (
     <Section>
-      <div className="text-center">
-        <h2 className="text-3xl font-bold tracking-tight">
-          Przykłady finansowania
-        </h2>
-        <p className="mt-2 text-base text-muted-foreground">
-          Zobacz, jak pomagamy naszym klientom.
-        </p>
-      </div>
+      <SectionHeading
+        title="Przykłady finansowania"
+        subtitle="Zobacz, jak pomagamy naszym klientom."
+      />
 
       <div className="mt-12 grid gap-8 sm:grid-cols-2">
         {CASES.map((c) => (

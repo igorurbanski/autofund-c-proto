@@ -1,4 +1,5 @@
 import { Section } from "@/components/section"
+import { SectionHeading } from "@/components/section-heading"
 
 const YEARS_ON_MARKET = new Date().getFullYear() - 2014
 
@@ -22,33 +23,31 @@ const FACTS = [
 
 export function TrustSection() {
   return (
-    <Section>
-      <div>
-        <div className="mx-auto max-w-narrow text-center">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Dlaczego <span className="text-brand-800">AutoFund</span>?
-          </h2>
-          <p className="mt-4 text-base text-muted-foreground">
-            Sprawdzony partner finansowy dla polskich przedsiębiorców — uczciwe
-            warunki, zero niespodzianek.
-          </p>
-        </div>
+    <div className="overflow-hidden rounded-[3rem] bg-brand-900">
+      <Section>
+        <SectionHeading
+          title="Dlaczego AutoFund?"
+          subtitle="Sprawdzony partner finansowy dla polskich przedsiębiorców — uczciwe warunki, zero niespodzianek."
+          className="mx-auto max-w-narrow [&_h2]:text-white [&_div]:text-zinc-400"
+        />
 
-        <div className="mt-14 flex flex-col gap-10 lg:flex-row lg:gap-14">
+        <div className="mt-12 flex flex-col divide-y divide-white/10 lg:flex-row lg:divide-x lg:divide-y-0">
           {FACTS.map((fact) => (
             <div
               key={fact.label}
-              className="flex-1 border-l-2 border-brand2-600 pl-6"
+              className="flex flex-1 flex-col items-center gap-4 py-10 text-center lg:px-10 lg:py-8"
             >
-              <p className="text-4xl font-extrabold tracking-tight">{fact.value}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {fact.label}
+              <p className="text-7xl font-semibold tracking-tight text-white lg:text-8xl">
+                {fact.value}
               </p>
-              <p className="mt-3 text-sm text-muted-foreground">{fact.text}</p>
+              <div className="space-y-2">
+                <p className="text-lg font-semibold text-brand-300">{fact.label}</p>
+                <p className="mx-auto max-w-[26ch] text-base text-white/60">{fact.text}</p>
+              </div>
             </div>
           ))}
         </div>
-      </div>
-    </Section>
+      </Section>
+    </div>
   )
 }

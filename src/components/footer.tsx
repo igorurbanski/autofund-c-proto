@@ -15,7 +15,7 @@ export function Footer() {
       <div className="mx-auto max-w-container px-5 py-16 lg:py-20">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="text-lg font-bold tracking-tight">AutoFund</p>
+            <p className="text-lg font-semibold tracking-tight">AutoFund</p>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               Pożyczki pod zabezpieczenie pojazdu dla firm. Działamy na terenie całej Polski.
             </p>
@@ -43,7 +43,7 @@ export function Footer() {
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Phone className="mt-0.5 size-4 shrink-0" />
                 <div>
-                  <a href="tel:+48798390147" className="font-bold transition-colors hover:text-foreground">
+                  <a href="tel:+48798390147" className="font-semibold transition-colors hover:text-foreground">
                     +48 798 390 147
                   </a>
                   <p className="text-xs">Biuro Obsługi Klienta</p>

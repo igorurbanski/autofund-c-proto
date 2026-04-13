@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { ArrowDown, ArrowRight, ChevronDown, ChevronRight } from "lucide-react"
+import { ArrowDown, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Section } from "@/components/section"
 import { SectionHeading } from "@/components/section-heading"
@@ -23,18 +23,18 @@ const COLOR_CLASSES: Record<
   { accent: string; ring: string; number: string; tileBg: string; btn: string }
 > = {
   violet: {
-    accent: "text-brand-500",
-    ring: "ring-brand-500",
-    number: "text-brand-200",
-    tileBg: "bg-brand-50",
-    btn: "bg-brand-500 hover:bg-brand-600",
+    accent: "text-orange-400",
+    ring: "ring-orange-400",
+    number: "text-orange-200",
+    tileBg: "bg-orange-50",
+    btn: "bg-orange-400 hover:bg-orange-500",
   },
   lime: {
-    accent: "text-brand2-700",
-    ring: "ring-brand2-700",
-    number: "text-brand2-300",
-    tileBg: "bg-brand2-50",
-    btn: "bg-brand2-700 hover:bg-brand2-800",
+    accent: "text-lime-400",
+    ring: "ring-lime-400",
+    number: "text-lime-200",
+    tileBg: "bg-lime-50",
+    btn: "bg-lime-400 hover:bg-lime-500",
   },
   plum: {
     accent: "text-brand-800",
@@ -44,11 +44,11 @@ const COLOR_CLASSES: Record<
     btn: "bg-brand-800 hover:bg-brand-900",
   },
   olive: {
-    accent: "text-brand2-900",
-    ring: "ring-brand2-800",
-    number: "text-brand2-400",
-    tileBg: "bg-brand2-100",
-    btn: "bg-brand2-900 hover:bg-brand2-950",
+    accent: "text-brand-300",
+    ring: "ring-brand-300",
+    number: "text-brand-200",
+    tileBg: "bg-brand-50",
+    btn: "bg-brand-300 hover:bg-brand-400",
   },
 }
 
@@ -86,12 +86,7 @@ export function ProductsProcessSections() {
     <>
       <Section id="oferta">
         <SectionHeading
-          title={
-            <>
-              Trzy sposoby na{" "}
-              <span className="text-brand-800">finansowanie</span>
-            </>
-          }
+          title="Cztery sposoby na finansowanie"
           subtitle="Dopasuj produkt do swojej sytuacji. Każda opcja to inna forma współpracy — wybierz tę, która Ci odpowiada."
         />
 
@@ -118,11 +113,10 @@ export function ProductsProcessSections() {
                   <CardTitle className={cn("text-xl", pColors.accent)}>
                     {product.name}
                   </CardTitle>
-                  <CardDescription>{product.tagline}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <p className="text-base text-muted-foreground">
-                    {product.description}
+                    <span className="font-medium text-foreground">{product.tagline}.</span>{" "}{product.description}
                   </p>
                 </CardContent>
                 <CardFooter className="justify-end">
@@ -137,104 +131,109 @@ export function ProductsProcessSections() {
                     <ArrowDown className="ml-2 size-4" />
                   </Button>
                 </CardFooter>
+                <Image
+                  src={`/product-${product.id}.jpg`}
+                  alt={product.name}
+                  width={600}
+                  height={450}
+                  className="aspect-4/3 w-full object-cover"
+                />
               </Card>
             )
           })}
         </div>
       </Section>
 
-      <Section id="jak-to-dziala" className="scroll-mt-20">
-        <div className="space-y-4 text-center">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Jak to działa?
-          </h2>
-          <div className="text-lg text-muted-foreground">
-            Poznaj kroki dla{" "}
-            <span ref={pickerRef} className="relative inline-block">
-              <button
-                onClick={() => setPickerOpen(!pickerOpen)}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border border-current/20 px-4 py-0.5 font-bold transition-colors hover:bg-muted",
-                  colors.accent
-                )}
-              >
-                {selected.name}
-                <ChevronDown
+      <Section id="jak-to-dziala" className="scroll-mt-20" narrow>
+        <SectionHeading
+          title="Jak to działa?"
+          subtitle={
+            <>
+              Poznaj kroki dla{" "}
+              <span ref={pickerRef} className="relative inline-block">
+                <button
+                  onClick={() => setPickerOpen(!pickerOpen)}
                   className={cn(
-                    "size-4 transition-transform duration-200",
-                    pickerOpen && "rotate-180"
+                    "inline-flex items-center gap-1.5 rounded-full border border-current/20 px-4 py-0.5 font-semibold transition-colors hover:bg-muted",
+                    colors.accent
                   )}
-                />
-              </button>
+                >
+                  {selected.name}
+                  <ChevronDown
+                    className={cn(
+                      "size-4 transition-transform duration-200",
+                      pickerOpen && "rotate-180"
+                    )}
+                  />
+                </button>
 
-              {pickerOpen && (
-                <div className="absolute left-1/2 top-full z-20 mt-2 w-52 -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-card p-1.5 shadow-lg">
-                  {PRODUCTS.map((product) => {
-                    const pColors = COLOR_CLASSES[product.color]
-                    const isActive = product.id === selectedId
-                    return (
-                      <button
-                        key={product.id}
-                        onClick={() => {
-                          handleSelect(product.id)
-                          setPickerOpen(false)
-                        }}
-                        className={cn(
-                          "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors",
-                          isActive ? "bg-muted" : "hover:bg-muted/60"
-                        )}
-                      >
-                        <product.icon
-                          className={cn("size-5 shrink-0", pColors.accent)}
-                        />
-                        <span
-                          className={cn("text-sm font-semibold", pColors.accent)}
+                {pickerOpen && (
+                  <div className="absolute left-1/2 top-full z-20 mt-2 w-52 -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-card p-1.5 shadow-lg">
+                    {PRODUCTS.map((product) => {
+                      const pColors = COLOR_CLASSES[product.color]
+                      const isActive = product.id === selectedId
+                      return (
+                        <button
+                          key={product.id}
+                          onClick={() => {
+                            handleSelect(product.id)
+                            setPickerOpen(false)
+                          }}
+                          className={cn(
+                            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors",
+                            isActive ? "bg-muted" : "hover:bg-muted/60"
+                          )}
                         >
-                          {product.name}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-            </span>
-          </div>
-        </div>
+                          <product.icon
+                            className={cn("size-5 shrink-0", pColors.accent)}
+                          />
+                          <span
+                            className={cn("text-sm font-semibold", pColors.accent)}
+                          >
+                            {product.name}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </span>
+            </>
+          }
+        />
 
         <div
           key={selected.id}
-          className="mt-14 grid grid-cols-1 gap-8 animate-in fade-in duration-300 md:grid-cols-3"
+          className="mt-14 grid grid-cols-1 gap-8 animate-in fade-in duration-300"
         >
           {selected.steps.map((step, i) => (
             <div
               key={i}
-              className="flex gap-4 md:block"
+              className="flex gap-4"
             >
               <div
-                className={cn(
-                  "flex aspect-square w-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl md:aspect-4/3 md:w-auto",
-                  colors.tileBg
-                )}
+                className="relative aspect-square w-30 shrink-0 self-start overflow-hidden rounded-2xl bg-white ring-1 ring-border md:w-36"
               >
-                <Image
-                  src={step.image}
-                  alt={step.title}
-                  width={240}
-                  height={240}
-                  className="size-4/5 object-contain"
-                />
-              </div>
-              <div className="flex flex-col justify-center md:pt-4">
+                <div className="absolute bottom-0 right-0 h-[92%] w-[92%]">
+                  <Image
+                    src={step.image}
+                    alt={step.title}
+                    fill
+                    className="translate-y-3 object-contain"
+                  />
+                </div>
                 <span
                   className={cn(
-                    "text-2xl font-extrabold md:text-3xl",
-                    colors.number
+                    "absolute left-3 top-3 text-3xl font-semibold",
+                    colors.accent
                   )}
                 >
-                  {String(i + 1).padStart(2, "0")}
+                  {i + 1}.
                 </span>
-                <h3 className="mt-1 text-base font-semibold md:text-lg">{step.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
+              </div>
+              <div className="flex flex-col justify-center">
+                <h3 className="mt-1 text-lg font-semibold">{step.title}</h3>
+                <p className="mt-1 text-base text-muted-foreground">
                   {step.description}
                 </p>
               </div>
